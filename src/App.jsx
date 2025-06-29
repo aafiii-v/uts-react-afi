@@ -1,3 +1,4 @@
+import Footer from "./components/Footer";
 import Header from "./components/Header";
 import Cars from "./Pages/Cars";
 
@@ -81,6 +82,7 @@ function App() {
     <>
       <Header />
       <Cars data={mobilList} />
+      <Footer />
     </>
   )
 }

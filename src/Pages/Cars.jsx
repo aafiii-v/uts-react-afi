@@ -43,7 +43,6 @@ const Cars = ({ data }) => {
 
   return (
     <>
-      {/* Icon keranjang kanan atas */}
       <div className="flex justify-end p-4 relative">
         <ShoppingCart className="w-10 h-10 text-gray-700" />
         <span className="absolute top-3 right-3 bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">

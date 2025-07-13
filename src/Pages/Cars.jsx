@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ShoppingCart } from 'lucide-react';
 
 const Cars = ({ data }) => {
@@ -7,6 +7,8 @@ const Cars = ({ data }) => {
   const [commentCar, setCommentCar] = useState(null);
   const [commentText, setCommentText] = useState("");
   const [cart, setCart] = useState([]);
+  const [dataCars, setDataCars] = useState(data);
+  const [sortOption, setSortOption] = useState('');
 
   const handleInfoClick = (car) => {
     setSelectedCar(car);
@@ -34,10 +36,39 @@ const Cars = ({ data }) => {
     const index = cart.findIndex((item) => item.id === car.id);
     if (index !== -1) {
       const newCart = [...cart];
-      newCart.splice(index, 1); // hapus 1 item berdasarkan index
+      newCart.splice(index, 1);
       setCart(newCart);
     }
   };
+
+  const handleChange = (e) => {
+    const keyword = e;
+    const filteredData = cars.filter(car => car.name.toLowerCase()
+      .includes(keyword.toLowerCase()) ||
+      car.color.toLowerCase().includes(keyword.toLowerCase()) ||
+      car.price.toString().includes(keyword) ||
+      car.name.toString().includes(keyword.toLowerCase())
+    );
+    setDataCars(filteredData);
+  }
+
+  const sortData = (option, data) => {
+    const sorted = [...data];
+    if (option === 'name-asc') {
+      sorted.sort((a, b) => a.name.localeCompare(b.name));
+    } else if (option === 'name-desc') {
+      sorted.sort((a, b) => b.name.localeCompare(a.name));
+    } else if (option === 'price-asc') {
+      sorted.sort((a, b) => a.price - b.price);
+    } else if (option === 'price-desc') {
+      sorted.sort((a, b) => b.price - a.price);
+    }
+    return sorted;
+  };
+
+  useEffect(() => {
+    setDataCars(prev => sortData(sortOption, prev));
+  }, [sortOption]);
 
   const totalHarga = cart.reduce((sum, car) => sum + car.price, 0);
 
@@ -49,10 +80,28 @@ const Cars = ({ data }) => {
           {cart.length}
         </span>
       </div>
+      <div className="flex items-center justify-center gap-5">
+        <input type="text"
+          className="w-6xl py-2 px-4 rounded-md border border-black-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onChange={(e) => handleChange(e.target.value)}
+          placeholder="Cari Mobil Impian Anda....."
+        />
 
-      {/* Kartu mobil */}
+        <select
+          onChange={(e) => setSortOption(e.target.value)}
+          className="py-2 px-3 rounded-md border border-black-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="" hidden>Sort By</option>
+          <option value="name-asc">Name A-Z</option>
+          <option value="name-desc">Name Z-A</option>
+          <option value="price-asc">Price Low to High</option>
+          <option value="price-desc">Price High to Low</option>
+        </select>
+
+      </div>
+      <h1 className="select-none text-3xl font-bold text-center my-6">🚗 Daftar Mobil</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 p-4">
-        {cars.map((car) => (
+        {dataCars.map((car) => (
           <div key={car.id} className="bg-white rounded-xl shadow-lg overflow-hidden">
             <img src={car.image} alt={car.name} className="w-full h-48 object-cover" />
             <div className="p-4">
@@ -132,7 +181,7 @@ const Cars = ({ data }) => {
               className="absolute top-2 right-2 bg-gray-300 hover:bg-gray-400 rounded-full w-8 h-8 text-black text-lg"
               onClick={() => setCommentCar(null)}
             >
-              ×
+              ✗
             </button>
             <h2 className="text-xl font-bold mb-4">Comment for {commentCar.name}</h2>
             <textarea
@@ -153,7 +202,7 @@ const Cars = ({ data }) => {
       )}
 
       {/* Ringkasan keranjang */}
-      <div className="bg-yellow-100 p-6 mt-8 rounded-xl shadow-lg mx-4 mb-10">
+      <div className="bg-blue-500 p-6 mt-8 rounded-xl shadow-lg mx-4 mb-10">
         <h2 className="text-xl font-bold mb-4">🛒 Cart</h2>
         {cart.length === 0 ? (
           <p className="text-gray-600">Keranjang kosong.</p>
